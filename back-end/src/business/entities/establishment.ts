@@ -2,10 +2,10 @@ export class Establishment {
  constructor(
   public readonly id:string,
   public readonly name:string,
-  public readonly estate: string,
+  public readonly state: string,
   public readonly city:string,
-  public readonly img:string,
   public readonly cep:string,
+  public readonly adress:string,
   public readonly tel:string,
   public readonly workingTime:string,
   public readonly discard:string[],
@@ -18,10 +18,10 @@ export class Establishment {
 
 export interface EstablishmentInputDTO {
  name:string,
- estate:string,
+ state:string,
  city:string,
- img:string,
  cep:string,
+ adress:string
  tel:string,
  workingTime:string,
  discard:string[],
@@ -29,12 +29,26 @@ export interface EstablishmentInputDTO {
  howDoesDiscart:string
 }
 
+export interface EstablishmentInputDataBase {
+ id:string
+ name:string,
+ state:string,
+ city:string,
+ cep:string,
+ adress:string
+ tel:string,
+ workingTime:string,
+ howToDiscard:string,
+ howDoesDiscart:string
+}
+
+
 export interface DiscardInputDTO {
  id:string,
  name:string
 }
 
-export interface EstabDiscaDTO {
+export interface EstabDiscarDTO {
  id:string,
  id_establishment:string,
  id_discard:string
