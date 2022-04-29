@@ -1,11 +1,11 @@
 import { BaseDatabase } from "./BaseDatabase";
-import { EstablishmentInputDataBase, Establishment, EstablishmentInputDTO, DiscardInputDTO, EstabDiscarDTO } from "../business/entities/establishment";
+import { EstablishmentInputDataBase, DiscartInputDTO, EstabDiscarDTO } from "../business/entities/establishment";
 import { CustomError } from "../business/error/CustomError"
 
 export class EstablishmentDataBase extends BaseDatabase {
 
  private static TABLE_ESTABLISHMENT = "establishment";
- private static TABLE_DISCARD = "discard";
+ private static TABLE_DISCART = "discart";
  private static TABLE_ESTAB_DISCAR = "estab_discar";
 
  public async createEstablishment(
@@ -14,7 +14,16 @@ export class EstablishmentDataBase extends BaseDatabase {
   try {
    await BaseDatabase.connection
     .insert({
-     establishment
+     id: establishment.id,
+     name: establishment.name,
+     state: establishment.state,
+     city: establishment.city,
+     cep: establishment.cep,
+     adress: establishment.adress,
+     tel: establishment.tel,
+     workingTime: establishment.workingTime,
+     howToDiscart: establishment.howToDiscart,
+     howDoesDiscart: establishment.howDoesDiscart
     })
     .into(EstablishmentDataBase.TABLE_ESTABLISHMENT)
   } catch (error) {
@@ -22,18 +31,19 @@ export class EstablishmentDataBase extends BaseDatabase {
   }
  }
 
- public async createDiscard(
-  discard: DiscardInputDTO
+ public async createDiscart(
+  discart: DiscartInputDTO
  ): Promise<void> {
   try {
    await BaseDatabase.connection
     .insert({
-     discard
+     id:discart.id,
+     name:discart.name
     })
-    .into(EstablishmentDataBase.TABLE_DISCARD)
+    .into(EstablishmentDataBase.TABLE_DISCART)
 
   } catch (error) {
-   throw new CustomError(500, "An unexpected error ocurred in create Discard")
+   throw new CustomError(500, "An unexpected error ocurred in create Discart")
   }
  }
 
@@ -43,12 +53,14 @@ export class EstablishmentDataBase extends BaseDatabase {
   try {
    await BaseDatabase.connection
     .insert({
-     estabDiscar
+     id:estabDiscar.id,
+     id_establishment:estabDiscar.id_establishment,
+     id_discart:estabDiscar.id_discart
     })
     .into(EstablishmentDataBase.TABLE_ESTAB_DISCAR)
 
   } catch (error) {
-   throw new CustomError(500, "An unexpected error ocurred in create Establishment Discard")
+   throw new CustomError(500, "An unexpected error ocurred in create Establishment Discart")
   }
  }
 
@@ -71,58 +83,47 @@ export class EstablishmentDataBase extends BaseDatabase {
      adress: est.adress,
      tel: est.tel,
      workingTime: est.workingTime,
-     howToDiscard: est.howToDiscard,
+     howToDiscart: est.howToDiscart,
      howDoesDiscart: est.howDoesDiscart
     }
    })
 
    return res[0]
   } catch (error) {
-   throw new CustomError(500, "An unexpected error ocurred in get Establishment")
+   throw new CustomError(500, "An unexpected error ocurred in get Establishment by id")
   }
  }
 
- public async getEstablishmentByEstate(
-  state: string
- ): Promise<EstablishmentInputDataBase[] | undefined> {
+ public async getDiscart(): Promise<DiscartInputDTO[]> {
   try {
    const result = await BaseDatabase.connection
     .select("*")
-    .from(EstablishmentDataBase.TABLE_ESTABLISHMENT)
-    .where({ state: state })
+    .from(EstablishmentDataBase.TABLE_DISCART)
 
-   let res: EstablishmentInputDataBase[] = result.map((est: any) => {
+   let res: DiscartInputDTO[] = result.map((disc: any) => {
     return {
-     id: est.id,
-     name: est.name,
-     estate: est.estate,
-     city: est.city,
-     cep: est.city,
-     adress: est.adress,
-     tel: est.tel,
-     workingTime: est.workingTime,
-     howToDiscard: est.howToDiscard,
-     howDoesDiscart: est.howDoesDiscart
+     id: disc.id,
+     name: disc.name
     }
    })
 
    return res
 
   } catch (error) {
-   throw new CustomError(500, "An unexpected error ocurred in get Establishment")
+   throw new CustomError(500, "An unexpected error ocurred in get descart")
   }
  }
 
- public async getDiscardById(
+ public async getDiscartById(
   id: string
- ): Promise<DiscardInputDTO | undefined> {
+ ): Promise<DiscartInputDTO | undefined> {
   try {
    const result = await BaseDatabase.connection
     .select("*")
-    .from(EstablishmentDataBase.TABLE_DISCARD)
+    .from(EstablishmentDataBase.TABLE_DISCART)
     .where({ id: id })
 
-   let res: DiscardInputDTO[] = result.map((disc: any) => {
+   let res: DiscartInputDTO[] = result.map((disc: any) => {
     return {
      id: disc.id,
      name: disc.name
@@ -132,30 +133,53 @@ export class EstablishmentDataBase extends BaseDatabase {
    return res[0]
 
   } catch (error) {
-   throw new CustomError(500, "An unexpected error ocurred in get Establishment")
+   throw new CustomError(500, "An unexpected error ocurred in get discart by id")
   }
  }
 
- public async getEstabDiscaByIdDiscard(
-  id_discard: string
+ public async getDiscartByName(
+  name: string
+ ): Promise<DiscartInputDTO | undefined> {
+  try {
+   const result = await BaseDatabase.connection
+    .select("*")
+    .from(EstablishmentDataBase.TABLE_DISCART)
+    .where({ name: name })
+
+   let res: DiscartInputDTO[] = result.map((disc: any) => {
+    return {
+     id: disc.id,
+     name: disc.name
+    }
+   })
+
+   return res[0]
+
+  } catch (error) {
+   throw new CustomError(500, "An unexpected error ocurred in get discart by name")
+  }
+ }
+
+ public async getEstabDiscaByIdDiscart(
+  id_discart: string
  ): Promise<EstabDiscarDTO[] | undefined> {
   try {
    const result = await BaseDatabase.connection
     .select("*")
     .from(EstablishmentDataBase.TABLE_ESTAB_DISCAR)
-    .where({ id_discard: id_discard })
+    .where({ id_discart: id_discart })
 
    let res: EstabDiscarDTO[] = result.map((estabDisc: any) => {
     return {
      id: estabDisc.id,
      id_establishment: estabDisc.id_establishment,
-     id_discard: estabDisc.id_discard
+     id_discart: estabDisc.id_discart
     }
    })
 
    return res
   } catch (error) {
-   throw new CustomError(500, "An unexpected error ocurred in get Establishment")
+   throw new CustomError(500, "An unexpected error ocurred in get estabDiscar by Id Discart")
   }
  }
 
@@ -172,13 +196,13 @@ export class EstablishmentDataBase extends BaseDatabase {
     return {
      id: estabDisc.id,
      id_establishment: estabDisc.id_establishment,
-     id_discard: estabDisc.id_discard
+     id_discart: estabDisc.id_discart
     }
    })
 
    return res
   } catch (error) {
-   throw new CustomError(500, "An unexpected error ocurred in get Establishment")
+   throw new CustomError(500, "An unexpected error ocurred in get estabDiscar by Id establishment ")
   }
  }
 
